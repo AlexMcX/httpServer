@@ -46,6 +46,27 @@ def parseToSqliteSelect(value):
 
     return result
 
+# registration:  {'email': ['a@t'], 'password': ['p']}
+# '{}','{}','{}','{}'
+def prsetoSqliteInsert(value):
+    result = ''
+    isFirst = True
+
+    for attr in value:
+        attrV = value[attr]
+
+        if (len(attrV) != 1):
+            return None
+
+        if (not isFirst):
+            result += ','
+
+        result += "'" + attrV[0] + "'"        
+
+        isFirst = False
+
+    return result
+
 # json example: {'uuid': ['373b2b48-2adc-11e9-a924-34e12d6aac5b']}
 # inst is instans of class : UserVO, ......
 def isEqualFields(json, inst):

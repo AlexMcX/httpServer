@@ -1,6 +1,6 @@
 import time
 import uuid
-from utils.objectEx import createObjectFromBD, parseToSqliteSelect, isEqualFields
+from utils.objectEx import *
 from database.baseBase import DataBaseBase
 from database.vo.userVO import UserVO
 from response.loginRequestHandler import LoginRequestHandler
@@ -32,15 +32,18 @@ class DataBaseUser(DataBaseBase):
     def register(self, params):
         result = RegisterRequestHandler()
 
-        if(self.isUser(params)):
-            result.setContentsUserExist()
+        result.setContentsUserExist()
 
+        if(self.__currentUser):
             return result
         
         # create new user if user not exist in base
-        self.createUser(params[UserVO.EMAIL_CONST][0], params[UserVO.PASSWORD_CONST][0])
+        isCreateUser = self.createUser(params)
+        
+        if (isCreateUser):
+            self.setCurrentUser(params)
 
-        result.setContentsSuccessfully()
+            result.setContentsSuccessfully(self.__currentUser.uuid)            
 
         return result
 
@@ -58,14 +61,25 @@ class DataBaseUser(DataBaseBase):
 
         return result
 
-    def createUser(self, email, password):
-        super().insert("'{}','{}','{}','{}'".format(uuid.uuid1(), email, password, time.time()))
+    # format insert bd - "uuid, email, password, createtime"
+    def createUser(self, params):
+        insert = prsetoSqliteInsert(params)
 
-        super().commit()
+        if (insert):
+            insert = "'{}',{},'{}'".format(uuid.uuid1(), insert, time.time())
+
+            isInsert = super().insert(insert)
+
+            if (isInsert) :
+                super().commit()
+
+                return True
+
+        return False
 
     def setCurrentUser(self, params):
         selected = parseToSqliteSelect(params)
-        
-        dbUser = super().readRow(selected)
 
+        dbUser = super().readRow(selected)
+        
         self.__currentUser = createObjectFromBD(UserVO, dbUser)

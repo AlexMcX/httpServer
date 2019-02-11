@@ -19,7 +19,14 @@ class DataBaseBase():
         self.__conn = sqlite3.connect(basePath, check_same_thread=False)
 
     def insert(self, params):
-        self.__cur.execute("INSERT INTO {} VALUES ({});".format(self.__table, params))
+        try :
+            self.__cur.execute("INSERT INTO {} VALUES ({});".format(self.__table, params))
+
+            return True
+        except sqlite3.IntegrityError as e:
+            print('DataBaseBase::insert - ', e)
+
+        return False
 
     # example: SELECT * FROM users WHERE email='user@gmail.com' and password='mypass'
     # whereParam: "email='user@gmail.com' and password='mypass'"
