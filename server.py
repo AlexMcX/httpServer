@@ -10,11 +10,20 @@ from response.badRequestHandler import BadRequestHandler
 class Server(BaseHTTPRequestHandler):
     dbUser = DataBaseUser()
 
+    __getPath__ = {
+            '/login'    :   dbUser.login,
+            '/auth'     :   dbUser.register,
+            '/logout'   :   dbUser.logOut
+        }
+
     @classmethod
     def pre_stop(cls):
         print ('Before calling Server close')
         cls.dbUser.saveAndClose()
 
+    @classmethod
+    def after_stop(cls):
+        print ('After calling Server close')
 
     def end_headers (self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -32,12 +41,14 @@ class Server(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
 
-        try:
-            handler = self.getGetHandlers()[path](params)          
-        except KeyError as e:
+        call = self.__getPath__.get(path)
+
+        if (call):
+            handler = call(params)
+        else:
             handler = BadRequestHandler()
 
-            print('Undefined client command: {}'.format(e.args[0]))
+            print('Undefined client command: {}'.format(path))
 
         self.respond({
                 'handler': handler
@@ -62,17 +73,3 @@ class Server(BaseHTTPRequestHandler):
     def respond(self, opts):
         response = self.handle_http(opts['handler'])
         self.wfile.write(response)
-
-    def getGetHandlers(self):
-        return {
-            "/login"    :   self.dbUser.login,
-            "/auth"     :   self.dbUser.register,
-            "/logout"   :   self.dbUser.logOut
-        }
-
-    # def getGetHandler(self, path, params):
-    #     return {
-    #         path == '/login': self.dbUser.login(params['username'][0], params['password'][0]),
-    #         path == '/auth':  self.dbUser.register(params['username'][0], params['password'][0]),
-    #         path == path :BadRequestHandler()
-    #     }[True]

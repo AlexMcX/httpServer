@@ -15,6 +15,8 @@ class LoginRequestHandler(RequestHandler):
     def setContentsUserNotExist(self):
         self.__contents = json.dumps({'result': False, 'message':'Email or password incorrect'})
 
-    def setContentsSuccess(self, uuid):
-        self.__contents = json.dumps({'result': True, 'uuid':uuid})
+    def setContentsSuccess(self, content):
+        content['result'] = True
+
+        self.__contents = json.dumps(content)
 

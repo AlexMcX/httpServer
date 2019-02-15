@@ -13,7 +13,7 @@ def getAllPublicVars(cl):
 def createObjectFromBD(cl, dbData):
     inst = cl()
     params = getAllPublicVars(cl)
-
+    
     if (len(dbData) != 0):
         for idx, val in enumerate(params):
             inst.__dict__[val] = dbData[0][idx]

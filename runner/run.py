@@ -11,7 +11,6 @@ class Run:
 
     def waitCommand(self):
         while True:
-            # print('wait command:')
             command = input('wait command:')
 
             try:
@@ -19,7 +18,7 @@ class Run:
             except KeyError as e:
                 print('Undefined command: {}'.format(e.args[0]))
 
-            if self.thread is None:
+            if (not self.thread):
                 return
 
 

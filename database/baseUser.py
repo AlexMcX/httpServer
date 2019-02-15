@@ -25,7 +25,7 @@ class DataBaseUser(DataBaseBase):
 
             return result
 
-        result.setContentsSuccess(self.__currentUser.uuid)
+        result.setContentsSuccess(self.__currentUser.getResponse())
 
         return result
 
@@ -43,7 +43,7 @@ class DataBaseUser(DataBaseBase):
         if (isCreateUser):
             self.setCurrentUser(params)
 
-            result.setContentsSuccessfully(self.__currentUser.uuid)            
+            result.setContentsSuccess(self.__currentUser.getResponse())           
 
         return result
 
@@ -64,6 +64,8 @@ class DataBaseUser(DataBaseBase):
     # format insert bd - "uuid, email, password, createtime"
     def createUser(self, params):
         insert = prsetoSqliteInsert(params)
+
+        print('      - ', insert)
 
         if (insert):
             insert = "'{}',{},'{}'".format(uuid.uuid1(), insert, time.time())

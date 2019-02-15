@@ -33,7 +33,9 @@ class Servers():
         self.httpd.RequestHandlerClass.pre_stop()
         self.httpd.shutdown()
         self.thread.join()
+        self.httpd.RequestHandlerClass.after_stop()
         self.thread = None
+        self.httpd = None
 
     def reload(self, httpd):
         if self.thread is not None and self.thread.isAlive:

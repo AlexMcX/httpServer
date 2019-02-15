@@ -20,5 +20,7 @@ class RegisterRequestHandler(RequestHandler):
     def setContentsUserExist(self):
         self.__contents = json.dumps({'result': False, 'message':'Register faild, user exist'})
 
-    def setContentsSuccessfully(self, uuid):
-        self.__contents = json.dumps({'result': True, 'uuid':uuid})
+    def setContentsSuccess(self, content):
+        content['result'] = True
+
+        self.__contents = json.dumps(content)
