@@ -1,46 +1,37 @@
-import sqlite3
+# if __name__ == '__main__':
+#     import baseBase
+#     bd = baseBase.DataBaseBase('db/userBD.db', 'users')
+#     bd.readRow("email='t@t' and password='p'")
 
-if __name__ == '__main__':
-    import baseBase
-    bd = baseBase.DataBaseBase('db/userBD.db', 'users')
-    bd.readRow("email='t@t' and password='p'")
+class DataBaseBase():    
+    SQLITE3 = 'sqlite3'
+    
+    __service = None
 
-class DataBaseBase():
-    __conn = None
-    __cur = None
-    __table = None
+    def __init__(self, baseType, basePath, table):
+        if(baseType == self.SQLITE3):
+            from database.sqlite3.baseService import BaseService
 
-    def __init__(self, basePath, table):
-        self.__table = table
-        self.__connection(basePath)
-        self.__cur = self.__conn.cursor()
+            self.__service = BaseService(basePath, table)
 
-    def __connection(self, basePath):
-        self.__conn = sqlite3.connect(basePath, check_same_thread=False)
-
+    # params is dict, 
+    # Example:
+    # {'email': ['myemail@gmail.com'], 'password': ['mypassword']} 
+    # or
+    # {'email': 'myemail@gmail.com', 'password': 'mypassword'}
     def insert(self, params):
-        try :
-            self.__cur.execute("INSERT INTO {} VALUES ({});".format(self.__table, params))
+        return self.__service.insert(params)
 
-            return True
-        except sqlite3.IntegrityError as e:
-            print('DataBaseBase::insert - ', e)
-
-        return False
-
-    # example: SELECT * FROM users WHERE email='user@gmail.com' and password='mypass'
-    # whereParam: "email='user@gmail.com' and password='mypass'"
-    def readRow(self, whereParam):
-        self.__cur.execute("SELECT * FROM {} WHERE {}".format(self.__table, whereParam))
-        
-        return self.__cur.fetchall()
+    # params is dict, 
+    # Example:
+    # {'email': ['myemail@gmail.com'], 'password': ['mypassword']} 
+    # or
+    # {'email': 'myemail@gmail.com', 'password': 'mypassword'}
+    def readRow(self, params):
+        return self.__service.readRow(params)
 
     def commit(self):
-        self.__conn.commit()
+        self.__service.commit()
 
     def close(self):
-        self.__conn.close()
-
-    def saveAndClose(self):
-        self.commit()
-        self.close()
+        self.__service.close()

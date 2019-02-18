@@ -7,13 +7,11 @@ from response.loginRequestHandler import LoginRequestHandler
 from response.registerRequestHandler import RegisterRequestHandler
 from response.logOutRequestHandler import LogOutRequestHandler
 
-class DataBaseUser(DataBaseBase):   
-
-    __UUID = None
+class DataBaseUser(DataBaseBase):
     __currentUser = None
 
     def __init__(self):
-        super().__init__('db/userBD.db', 'users')
+        super().__init__(super().SQLITE3, 'db/userBD.db', 'users')
 
     def login(self, params):
         result = LoginRequestHandler()
@@ -63,15 +61,14 @@ class DataBaseUser(DataBaseBase):
 
     # format insert bd - "uuid, email, password, createtime"
     def createUser(self, params):
-        insert = prsetoSqliteInsert(params)
+        if (params):
+            insert = params.copy()
 
-        print('      - ', insert)
-
-        if (insert):
-            insert = "'{}',{},'{}'".format(uuid.uuid1(), insert, time.time())
+            insert['uuid'] = str(uuid.uuid1())
+            insert['time'] = time.time()
 
             isInsert = super().insert(insert)
-
+            
             if (isInsert) :
                 super().commit()
 
@@ -80,8 +77,12 @@ class DataBaseUser(DataBaseBase):
         return False
 
     def setCurrentUser(self, params):
-        selected = parseToSqliteSelect(params)
-
-        dbUser = super().readRow(selected)
+        dbUser = super().readRow(params)
         
         self.__currentUser = createObjectFromBD(UserVO, dbUser)
+
+    def getUUID(self):
+        if self.__currentUser:
+            return self.__currentUser.uuid
+
+        return None

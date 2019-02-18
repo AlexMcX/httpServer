@@ -10,9 +10,7 @@ class RegisterRequestHandler(RequestHandler):
         self.setStatus(200)
 
     def getContents(self):
-        return self.__contents 
-        
-        # json.dumps({'result': False, 'message':'Register succesfull'})
+        return self.__contents
 
     def setContents(self, value):
         self.__contents = value

@@ -2,24 +2,20 @@ import os
 from urllib.parse import parse_qs, urlparse, parse_qsl
 from http.server import BaseHTTPRequestHandler
 from routes.main import routes
-from database.baseUser import DataBaseUser
-from response.staticHandler import StaticHandler
-from response.templateHandler import TemplateHandler
-from response.badRequestHandler import BadRequestHandler
+from client.client import Client
 
 class Server(BaseHTTPRequestHandler):
-    dbUser = DataBaseUser()
-
-    __getPath__ = {
-            '/login'    :   dbUser.login,
-            '/auth'     :   dbUser.register,
-            '/logout'   :   dbUser.logOut
-        }
+    __clients = {} 
 
     @classmethod
     def pre_stop(cls):
         print ('Before calling Server close')
-        cls.dbUser.saveAndClose()
+        # cls.dbUser.saveAndClose()
+
+        for uuid, client in cls.__clients.items():
+            client.save()
+
+            break
 
     @classmethod
     def after_stop(cls):
@@ -36,23 +32,41 @@ class Server(BaseHTTPRequestHandler):
         print('Server:do_POST --- ')
 
     def do_GET(self):
+        isNewClient = False
+
         print('Server::do_GET - ', self.path)
 
         path = urlparse(self.path).path
         params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
 
-        call = self.__getPath__.get(path)
-
-        if (call):
-            handler = call(params)
+        if not 'uuid' in params:
+            uuid = None
         else:
-            handler = BadRequestHandler()
+            uuid = params['uuid'][0]
 
-            print('Undefined client command: {}'.format(path))
+        if not uuid or not uuid in self.__clients:
+            client = Client()
+
+            isNewClient = True
+        else:
+            print(params['uuid'][0])
+            print(self.__clients)
+            client = self.__clients[params['uuid'][0]]
+        
+        handler = client.do_GET(path, params)
+        
+        if isNewClient and client.getUUID():
+            self.__clients[client.getUUID()] = client
+
+            print("        APPEND NEW USER: uuid:", client.getUUID())
 
         self.respond({
                 'handler': handler
             })       
+
+    # промоніторити закриття сесії браузера і видатити слієнта якщо його немає
+    # в браузері розібратись що відбувається коли закривається вкладка, як зробити щоб через х хв видалялись куки
+    # закриття сесії в браузері
 
     def handle_http(self, handler):
         print('Server::handle_http - ')

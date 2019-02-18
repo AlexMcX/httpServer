@@ -21,30 +21,30 @@ def createObjectFromBD(cl, dbData):
         return inst
     return None
 
-# value is unpalsle object
-# value example: {'email': ['user@gmail.com'], 'password': ['mypass']}
-# return : "email='user@gmail.com' and password='mypass'"
-def parseToSqliteSelect(value):
-    result = ''
-    attrV = None
-    isFirst = None
+# # value is unpalsle object
+# # value example: {'email': ['user@gmail.com'], 'password': ['mypass']}
+# # return : "email='user@gmail.com' and password='mypass'"
+# def parseToSqliteSelect(value):
+#     result = ''
+#     attrV = None
+#     isFirst = None
     
-    for attr in value:
-        attrV = value[attr]
+#     for attr in value:
+#         attrV = value[attr]
         
-        isFirst = True
+#         isFirst = True
         
-        if (result.strip()):
-            result += ' and '
+#         if (result.strip()):
+#             result += ' and '
 
-        for attrVattr in attrV:
-            if (not isFirst):
-                result += " or "
-            result += attr + "='" + attrVattr + "'"
+#         for attrVattr in attrV:
+#             if (not isFirst):
+#                 result += " or "
+#             result += attr + "='" + attrVattr + "'"
 
-            isFirst = False
+#             isFirst = False
 
-    return result
+#     return result
 
 # registration:  {'email': ['a@t'], 'password': ['p']}
 # '{}','{}','{}','{}'
