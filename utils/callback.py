@@ -34,10 +34,9 @@ class CallBack:
     
     def fire(self, *params):
         lenParmas = len(params)
-        
-        for index in self.__items:
-            call = self.__items[index]
+        calls = list(self.__items.values())
 
+        for call in calls:
             if lenParmas == 0:
                 call()
             elif lenParmas == 1:
