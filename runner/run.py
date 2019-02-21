@@ -2,12 +2,12 @@ import servers
 import threading
 
 class Run:
-    thread = None
-    server = None
-
     def __init__(self):
+        self.server = None
         self.thread = threading.Thread(None, self.waitCommand)
         self.thread.start()
+
+        # self.startServer()
 
     def waitCommand(self):
         while True:

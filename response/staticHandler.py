@@ -1,8 +1,6 @@
 import os
 
 from response.requestHandler import RequestHandler
-
-
 class StaticHandler(RequestHandler):
     def __init__(self):
         self.filetypes = {

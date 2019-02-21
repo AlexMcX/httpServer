@@ -1,11 +1,8 @@
 import sqlite3
 
-class BaseService():
-    __conn = None
-    __cur = None
-    __table = None
-    
+class BaseService():    
     def __init__(self, basePath, table):
+        self.__conn = None
         self.__table = table
         self.__connection(basePath)
         self.__cur = self.__conn.cursor()

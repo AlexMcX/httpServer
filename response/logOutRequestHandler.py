@@ -2,10 +2,9 @@ import json
 from response.requestHandler import RequestHandler
 
 class LogOutRequestHandler(RequestHandler):
-    __contents = None
-
     def __init__(self):
         super().__init__()
+        self.__contents = None
         self.contentType = 'application/json'
         self.setStatus(200)
 

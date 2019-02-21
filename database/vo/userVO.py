@@ -1,14 +1,15 @@
 from database.vo.baseVO import BaseVO
 
-class UserVO(BaseVO):
-    email = None
-    password = None
-    firstName = None
-    lastName = None
-    nickName = None
-    uuid = None
-    createdate = None
-    
+class UserVO(BaseVO):   
+    def __init__(self):
+        self.email = None
+        self.password = None
+        self.firstName = None
+        self.lastName = None
+        self.nickName = None
+        self.uuid = None
+        self.createdate = None
+
     def __getResponses__(self):
         return [ 
                     id(self.email),

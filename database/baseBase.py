@@ -6,9 +6,9 @@
 class DataBaseBase():    
     SQLITE3 = 'sqlite3'
     
-    __service = None
-
     def __init__(self, baseType, basePath, table):
+        self.__service = None
+
         if(baseType == self.SQLITE3):
             from database.sqlite3.baseService import BaseService
 

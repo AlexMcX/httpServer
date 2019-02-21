@@ -1,21 +1,28 @@
 import os
+from const.pathConst import PathConst
+from response.badRequestHandler import BadRequestHandler
 from urllib.parse import parse_qs, urlparse, parse_qsl
 from http.server import BaseHTTPRequestHandler
-from routes.main import routes
 from client.client import Client
 
 class Server(BaseHTTPRequestHandler):
-    __clients = {} 
+    def __init__(self, request, client_address, server):
+        self.__clients = {}
+        self.__cLoginID = None
+        self.__cLogOutID = None
+        print(' <<<<<<<<<<<<<<< Create new server instance >>>>>>>>>>>>>>>>> ')
+
+        BaseHTTPRequestHandler.__init__(self, request, client_address, server)         
 
     @classmethod
     def pre_stop(cls):
         print ('Before calling Server close')
         # cls.dbUser.saveAndClose()
 
-        for uuid, client in cls.__clients.items():
-            client.save()
+        # for uuid, client in cls.__clients.items():
+        #     client.save()
 
-            break
+        #     break
 
     @classmethod
     def after_stop(cls):
@@ -32,44 +39,28 @@ class Server(BaseHTTPRequestHandler):
         print('Server:do_POST --- ')
 
     def do_GET(self):
-        isNewClient = False
-
         print('Server::do_GET - ', self.path)
 
         path = urlparse(self.path).path
         params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
 
-        if not 'uuid' in params:
-            uuid = None
+        client = self.__getClientToParams(params)
+
+        if not client and path == PathConst.LOGIN:
+            client = Client()           
+
+            self.__listenersClient(client, True)
+
+        if client:
+            handler = client.do_GET(path, params)
         else:
-            uuid = params['uuid'][0]
-
-        if not uuid or not uuid in self.__clients:
-            client = Client()
-
-            isNewClient = True
-        else:
-            print(params['uuid'][0])
-            print(self.__clients)
-            client = self.__clients[params['uuid'][0]]
-        
-        handler = client.do_GET(path, params)
-        
-        if isNewClient and client.getUUID():
-            self.__clients[client.getUUID()] = client
-
-            print("        APPEND NEW USER: uuid:", client.getUUID())
+            handler = BadRequestHandler()
 
         self.respond({
                 'handler': handler
-            })       
-
-    # промоніторити закриття сесії браузера і видатити слієнта якщо його немає
-    # в браузері розібратись що відбувається коли закривається вкладка, як зробити щоб через х хв видалялись куки
-    # закриття сесії в браузері
+            })
 
     def handle_http(self, handler):
-        print('Server::handle_http - ')
         status_code = handler.getStatus()
 
         self.send_response(status_code)
@@ -81,9 +72,48 @@ class Server(BaseHTTPRequestHandler):
             content = "404 Not Found"
 
         self.end_headers()
-        print('handle_http content: ', content)
+        
         return bytes(content, 'UTF-8')
 
     def respond(self, opts):
         response = self.handle_http(opts['handler'])
-        self.wfile.write(response)
+        self.wfile.write(response)    
+
+    def __getClientToParams(self, params):
+        uuid = None
+        
+        if 'uuid' in params:
+            uuid = params['uuid'][0]
+
+        if not uuid or not uuid in self.__clients:
+            return None
+
+        return self.__clients[uuid]
+
+    # ******************** listeners ********************
+    def __listenersClient(self, client, access):
+        if not client:
+            return
+
+        if access:
+            self.__cLoginID = client.onLogin.add((lambda client: self.__onLogin(client)))
+            self.__cLogOutID = client.onLogout.add((lambda client: self.__onLogout(client)))
+        else:
+            client.onLogin.remove(self.__cLoginID)
+            client.onLogout.remove(self.__cLogOutID)
+
+    def __onLogin(self, client):
+        print("\n LOGIN NEW USER: total count:{}, user uuid:{} \n".format(len(self.__clients), client.UUID))
+
+        self.__clients[client.UUID] = client
+
+    def __onLogout(self, client):
+        if not client:
+            return
+
+        self.__listenersClient(client, False)
+        self.__clients.pop(client.UUID, None)
+
+        print("\n LOGOUT NEW USER: total count:{}, user uuid:{} \n".format(len(self.__clients), client.UUID))
+        
+    # ***************************************************

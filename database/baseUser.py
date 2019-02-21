@@ -6,11 +6,11 @@ from database.vo.userVO import UserVO
 from response.loginRequestHandler import LoginRequestHandler
 from response.registerRequestHandler import RegisterRequestHandler
 from response.logOutRequestHandler import LogOutRequestHandler
-
 class DataBaseUser(DataBaseBase):
-    __currentUser = None
-
     def __init__(self):
+        self.__currentUser = None
+        self.__uuid = None
+        
         super().__init__(super().SQLITE3, 'db/userBD.db', 'users')
 
     def login(self, params):
@@ -80,9 +80,8 @@ class DataBaseUser(DataBaseBase):
         dbUser = super().readRow(params)
         
         self.__currentUser = createObjectFromBD(UserVO, dbUser)
+        self.__uuid = self.__currentUser.uuid
 
+    @property
     def getUUID(self):
-        if self.__currentUser:
-            return self.__currentUser.uuid
-
-        return None
+        return self.__uuid

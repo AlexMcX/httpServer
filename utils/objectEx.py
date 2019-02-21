@@ -1,6 +1,5 @@
 def getAllPublicVars(cl):
     result = []
-
     for attr, value in cl.__dict__.items():
         if(attr.find('_CONST') == -1 and attr.find('__') == -1):
             result.append(attr)
@@ -12,7 +11,7 @@ def getAllPublicVars(cl):
 # [('373b2b48-2adc-11e9-a924-34e12d6aac5b', 't@t', 'p', 1549546091.930708)]
 def createObjectFromBD(cl, dbData):
     inst = cl()
-    params = getAllPublicVars(cl)
+    params = getAllPublicVars(inst)
     
     if (len(dbData) != 0):
         for idx, val in enumerate(params):
@@ -20,31 +19,6 @@ def createObjectFromBD(cl, dbData):
         
         return inst
     return None
-
-# # value is unpalsle object
-# # value example: {'email': ['user@gmail.com'], 'password': ['mypass']}
-# # return : "email='user@gmail.com' and password='mypass'"
-# def parseToSqliteSelect(value):
-#     result = ''
-#     attrV = None
-#     isFirst = None
-    
-#     for attr in value:
-#         attrV = value[attr]
-        
-#         isFirst = True
-        
-#         if (result.strip()):
-#             result += ' and '
-
-#         for attrVattr in attrV:
-#             if (not isFirst):
-#                 result += " or "
-#             result += attr + "='" + attrVattr + "'"
-
-#             isFirst = False
-
-#     return result
 
 # registration:  {'email': ['a@t'], 'password': ['p']}
 # '{}','{}','{}','{}'
