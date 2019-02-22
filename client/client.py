@@ -38,10 +38,12 @@ class Client:
 
             print('Undefined client command: {}'.format(path))
         
-        if path == PathConst.LOGIN:
+        if path == PathConst.LOGIN or path == PathConst.AUTHORIZATION:
             self.__onLogin.fire(self)
         elif path == PathConst.LOGOUNT:
             self.__onLogout.fire(self)
+
+        self.__dbUser.updateLastVisit()
 
         return handler
 

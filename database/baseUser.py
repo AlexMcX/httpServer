@@ -65,7 +65,8 @@ class DataBaseUser(DataBaseBase):
             insert = params.copy()
 
             insert['uuid'] = str(uuid.uuid1())
-            insert['time'] = time.time()
+            insert['time'] = time.gmtime()
+            insert['lastvisittime'] = time.time()
 
             isInsert = super().insert(insert)
             
@@ -80,7 +81,13 @@ class DataBaseUser(DataBaseBase):
         dbUser = super().readRow(params)
         
         self.__currentUser = createObjectFromBD(UserVO, dbUser)
-        self.__uuid = self.__currentUser.uuid
+        
+        if self.__currentUser:
+            self.__uuid = self.__currentUser.uuid
+
+    def updateLastVisit(self):
+        if self.__currentUser:
+            self.__currentUser.lastvisittime = time.time()
 
     @property
     def getUUID(self):

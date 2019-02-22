@@ -23,22 +23,20 @@ class Servers():
         self.thread = threading.Thread(None, self.httpd.serve_forever)
         self.thread.start()
 
-        self.httpd.serve_forever()
-
     def stopServer(self):
         print(time.asctime(), 'Server Stops - %s:%s' % (self.HOST_NAME, self.PORT_NUMBER))
         self.httpd.RequestHandlerClass.pre_stop()
         self.httpd.shutdown()
-        # self.thread.join()
+        self.thread.join()
         self.httpd.RequestHandlerClass.after_stop()
-        # self.thread = None
+        self.thread = None
         self.httpd = None
 
     def reload(self, httpd):
-        # if self.thread is not None and self.thread.isAlive:
-            # self.stopServer()
+        if self.thread is not None and self.thread.isAlive:
+            self.stopServer()
         
-        # self.startServer()
+        self.startServer()
 
         pass
 

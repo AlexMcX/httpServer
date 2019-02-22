@@ -13,7 +13,7 @@ class Clients:
     def do_GET(self, path, params):
         client = self.__getClientToParams(params)
 
-        if not client and path == PathConst.LOGIN:
+        if not client and (path == PathConst.LOGIN or PathConst.AUTHORIZATION):
             client = Client()           
 
             self.__listenersClient(client, True)
@@ -24,6 +24,10 @@ class Clients:
             handler = BadRequestHandler()
 
         return handler
+
+    def save(self):
+        for uuid, client in self.__clients.items():
+            client.save()
 
     def __getClientToParams(self, params):
         uuid = None
@@ -61,5 +65,4 @@ class Clients:
         self.__clients.pop(client.UUID, None)
 
         print("    <<< LOGOUT USER: total count:{}, user uuid:{}".format(len(self.__clients), client.UUID))
-        
     # ***************************************************

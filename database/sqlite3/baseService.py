@@ -26,9 +26,9 @@ class BaseService():
     # whereParam: "email='user@gmail.com' and password='mypass'"
     def readRow(self, params):
         whereParam = self.__parseToSelect(params)
-
-        self.__cur.execute("SELECT * FROM {} WHERE {}".format(self.__table, whereParam))
         
+        self.__cur.execute("SELECT * FROM {} WHERE {}".format(self.__table, whereParam))
+
         return self.__cur.fetchall()
 
     def commit(self):

@@ -9,12 +9,8 @@ class Server(BaseHTTPRequestHandler):
     @classmethod
     def pre_stop(cls):
         print ('Before calling Server close')
-        # cls.dbUser.saveAndClose()
 
-        # for uuid, client in cls.__clients.items():
-        #     client.save()
-
-        #     break
+        Server.__clients.save()   
 
     @classmethod
     def after_stop(cls):
@@ -39,22 +35,6 @@ class Server(BaseHTTPRequestHandler):
         self.respond({
                 'handler': Server.__clients.do_GET(path, params)
             })
-
-        # client = self.__getClientToParams(params)
-
-        # if not client and path == PathConst.LOGIN:
-        #     client = Client()           
-
-        #     self.__listenersClient(client, True)
-
-        # if client:
-        #     handler = client.do_GET(path, params)
-        # else:
-        #     handler = BadRequestHandler()
-
-        # self.respond({
-        #         'handler': handler
-        #     })
 
     def handle_http(self, handler):
         status_code = handler.getStatus()
