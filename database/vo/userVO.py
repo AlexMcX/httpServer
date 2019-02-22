@@ -9,6 +9,7 @@ class UserVO(BaseVO):
         self.nickName = None
         self.uuid = None
         self.createdate = None
+        self.lastvisittime = None
 
     def __getResponses__(self):
         return [ 
