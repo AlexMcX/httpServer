@@ -17,6 +17,8 @@ def createObjectFromBD(cl, dbData):
         for idx, val in enumerate(params):
             inst.__dict__[val] = dbData[0][idx]
         
+        inst.updateChange()
+
         return inst
     return None
 

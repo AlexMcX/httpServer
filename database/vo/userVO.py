@@ -11,7 +11,7 @@ class UserVO(BaseVO):
         self.createdate = None
         self.lastvisittime = None
 
-    def __getResponses__(self):
+    def _BaseVO__getResponses(self):
         return [ 
                     id(self.email),
                     id(self.firstName),
@@ -19,3 +19,6 @@ class UserVO(BaseVO):
                     id(self.nickName),
                     id(self.uuid)
                 ]
+
+    def _BaseVO__getUnique(self):
+        return {'uuid':self.uuid}

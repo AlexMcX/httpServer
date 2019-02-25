@@ -2,6 +2,7 @@ import os
 from urllib.parse import parse_qs, urlparse, parse_qsl
 from http.server import BaseHTTPRequestHandler
 from client.clients import Clients
+from service.dataBaseService import DataBaseService
 
 class Server(BaseHTTPRequestHandler):
     __clients = Clients()
@@ -10,7 +11,9 @@ class Server(BaseHTTPRequestHandler):
     def pre_stop(cls):
         print ('Before calling Server close')
 
-        Server.__clients.save()   
+        Server.__clients.save()
+
+        DataBaseService.commitAndClose()
 
     @classmethod
     def after_stop(cls):

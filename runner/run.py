@@ -4,6 +4,8 @@ class Run:
     def __init__(self):
         self.server = None
 
+        self.startServer()
+
         self.waitCommand()
 
     def waitCommand(self):

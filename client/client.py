@@ -48,8 +48,7 @@ class Client:
         return handler
 
     def save(self):
-        self.__dbUser.commit()
-        self.__dbUser.close()
+        self.__dbUser.save()
 
     @property
     def UUID(self):

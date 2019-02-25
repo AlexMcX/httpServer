@@ -6,12 +6,12 @@ from database.vo.userVO import UserVO
 from response.loginRequestHandler import LoginRequestHandler
 from response.registerRequestHandler import RegisterRequestHandler
 from response.logOutRequestHandler import LogOutRequestHandler
+from service.dataBaseService import DataBaseService
 class DataBaseUser(DataBaseBase):
     def __init__(self):
         self.__currentUser = None
         self.__uuid = None
-        
-        super().__init__(super().SQLITE3, 'db/userBD.db', 'users')
+        self.__userBD = DataBaseService.getInstance().users
 
     def login(self, params):
         result = LoginRequestHandler()
@@ -59,6 +59,11 @@ class DataBaseUser(DataBaseBase):
 
         return result
 
+    def save(self):
+        saveData = self.__currentUser.getChangeCampression()
+
+        self.__userBD.change(saveData)
+
     # format insert bd - "uuid, email, password, createtime"
     def createUser(self, params):
         if (params):
@@ -68,17 +73,17 @@ class DataBaseUser(DataBaseBase):
             insert['time'] = time.gmtime()
             insert['lastvisittime'] = time.time()
 
-            isInsert = super().insert(insert)
+            isInsert = self.__userBD.insert(insert)
             
             if (isInsert) :
-                super().commit()
+                self.__userBD.commit()
 
                 return True
 
         return False
 
     def setCurrentUser(self, params):
-        dbUser = super().readRow(params)
+        dbUser = self.__userBD.read(params)
         
         self.__currentUser = createObjectFromBD(UserVO, dbUser)
         
