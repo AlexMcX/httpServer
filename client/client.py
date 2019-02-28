@@ -1,8 +1,6 @@
 from const.pathConst import PathConst
 from utils.callback import CallBack
 from database.baseUser import DataBaseUser
-from response.staticHandler import StaticHandler
-from response.templateHandler import TemplateHandler
 from response.badRequestHandler import BadRequestHandler
 
 class Client:    

@@ -53,9 +53,16 @@ class Clients:
             client.onLogout.remove(self.__cLogOutID)
 
     def __onLogin(self, client):
-        self.__clients[client.UUID] = client
+        if client.UUID:
+            self.__clients[client.UUID] = client
 
-        print("    <<< LOGIN USER: total count:{}, user uuid:{} ".format(len(self.__clients), client.UUID))
+            print("    <<< LOGIN USER: total count:{}, user uuid:{} ".format(len(self.__clients), client.UUID))
+        else:
+            self.__listenersClient(client, False)
+
+            del client
+
+            print("    <<< FAILD LOGIN USER")
 
     def __onLogout(self, client):
         if not client:

@@ -20,7 +20,7 @@ class DataBaseSqlite(DataBaseBase):
             self.__cur.execute("INSERT INTO {} VALUES ({});".format(super().currentTable, data))
 
             return True
-        except sqlite3.IntegrityError as e:
+        except sqlite3.OperationalError as e:
             print('ERROR !!!!!! DataBaseBase::insert - ', e)
 
         return False

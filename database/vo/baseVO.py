@@ -30,11 +30,30 @@ class BaseVO() :
         return result
     # ********************************************
 
+    # def getResponse(self):
+    #     return self.__createResponse(self.__getResponses())
+        # var = self.__getResponses()
 
-    def getResponse(self):
-        var = self.__getResponses()
+        # if (not var): return None
+            
+        # result = {}
 
-        if (not var): return None
+        # local = locals()
+        
+        # for k in local:
+        #     if (k == 'self'):                
+        #         for varID in var:
+        #             for attr, value in local[k].__dict__.items():
+        #                 if (varID == id(value)):
+        #                     result[attr] = value
+        #                     continue
+
+        #         break
+
+        # return result
+    
+    def _createResponse(self, params):
+        if (not params): return None
             
         result = {}
 
@@ -42,7 +61,7 @@ class BaseVO() :
         
         for k in local:
             if (k == 'self'):                
-                for varID in var:
+                for varID in params:
                     for attr, value in local[k].__dict__.items():
                         if (varID == id(value)):
                             result[attr] = value
@@ -51,14 +70,15 @@ class BaseVO() :
                 break
 
         return result
- 
-    def __getResponses(self):
-        return None
+
+
+    # def __getResponses(self):
+        # return None
     
     # return object as example :
     # {'uuid':483dc9e6-3132-11e9-8d2b-34e12d6aac5c}
     # to change or save data to database 
-    def __getUnique(self):
+    def _getUnique(self):
         return None
 
             

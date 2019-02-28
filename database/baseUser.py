@@ -23,7 +23,7 @@ class DataBaseUser(DataBaseBase):
 
             return result
 
-        result.setContentsSuccess(self.__currentUser.getResponse())
+        result.setContentsSuccess(self.__currentUser.getLoginResponse())
 
         return result
 
@@ -41,7 +41,7 @@ class DataBaseUser(DataBaseBase):
         if (isCreateUser):
             self.setCurrentUser(params)
 
-            result.setContentsSuccess(self.__currentUser.getResponse())           
+            result.setContentsSuccess(self.__currentUser.getLoginResponse())           
 
         return result
 
@@ -69,8 +69,9 @@ class DataBaseUser(DataBaseBase):
         if (params):
             insert = params.copy()
 
+            insert['icon'] = ''
             insert['uuid'] = str(uuid.uuid1())
-            insert['time'] = time.gmtime()
+            insert['time'] = time.time()
             insert['lastvisittime'] = time.time()
 
             isInsert = self.__userBD.insert(insert)

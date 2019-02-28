@@ -25,7 +25,6 @@ class DataBaseService:
             bd.commit()
             bd.close()
 
-
     def __init__(self):
       """ Virtually private constructor. """
       if DataBaseService.__instance != None:
