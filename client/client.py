@@ -1,22 +1,17 @@
 from const.pathConst import PathConst
+from const.routeConst import RouteConst
 from utils.callback import CallBack
-from database.baseUser import DataBaseUser
-from response.badRequestHandler import BadRequestHandler
-
+from routing.response.badRequestHandler import BadRequestHandler
 class Client:    
     def __init__(self):
-        self.__dbUser = DataBaseUser()
+        self.__user = None
         self.__sLogin = None
         self.__sLogout = None
 
         self.__onLogin = CallBack()
         self.__onLogout = CallBack()
 
-        self.__getPath = {
-                PathConst.LOGIN             :   self.__dbUser.login,
-                PathConst.AUTHORIZATION     :   self.__dbUser.register,
-                PathConst.LOGOUNT           :   self.__dbUser.logOut
-        }
+        self.__routing = None
 
     @property
     def onLogin(self):
@@ -27,30 +22,61 @@ class Client:
         return self.__onLogout
 
     def do_GET(self, path, params):
-        call = self.__getPath.get(path)
+        handler = None
 
-        if (call):
-            handler = call(params)
-        else:
-            handler = BadRequestHandler()
+        if not self.__user and \
+        (path == PathConst.LOGIN or path == PathConst.AUTHORIZATION):
+            auth = RouteConst.ROUTES.get('auth')()
 
-            print('Undefined client command: {}'.format(path))
-        
-        if path == PathConst.LOGIN or path == PathConst.AUTHORIZATION:
+            handler = auth.do_GET(path, params)
+            
+            if handler.getStatus() == 200:
+                self.__user = auth.user
+
+                self.__initRoutes(auth)
+
             self.__onLogin.fire(self)
-        elif path == PathConst.LOGOUNT:
-            self.__onLogout.fire(self)
+        else:
+            handler = self.__getHandlerGET(path, params)
 
-        self.__dbUser.updateLastVisit()
+            if path == PathConst.LOGOUNT:
+                self.__onLogout.fire(self)
+
+        if not handler:
+            handler = BadRequestHandler()
 
         return handler
 
     def save(self):
-        self.__dbUser.save()
+        for route in self.__routing:
+            route.save()
+
+    def dispose(self):
+        pass
+
+    def __getHandlerGET(self, path, params):
+        if self.__routing:
+            for route in self.__routing:
+                result = route.do_GET(path, params)
+
+                if result:
+                    return result
+
+        return None
+
+    def __initRoutes(self, auth):
+        self.__routing = [auth]
+
+        for path, cl in RouteConst.ROUTES.items():
+            if not isinstance(auth, cl):
+                self.__routing.append(cl(self.__user))
 
     @property
     def UUID(self):
-        return self.__dbUser.getUUID
+        if self.__user:
+            return self.__user.uuid
+
+        return None
 
 
     

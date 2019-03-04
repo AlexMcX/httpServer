@@ -1,7 +1,6 @@
 from const.pathConst import PathConst
 from client.client import Client
-from response.badRequestHandler import BadRequestHandler
-
+from routing.response.badRequestHandler import BadRequestHandler
 class Clients:
     def __init__(self):
         print(' <<<<<<<<<<<<<<< Create new clients instance >>>>>>>>>>>>>>>>> ')
@@ -71,5 +70,9 @@ class Clients:
         self.__listenersClient(client, False)
         self.__clients.pop(client.UUID, None)
 
+        client.dispose()       
+
         print("    <<< LOGOUT USER: total count:{}, user uuid:{}".format(len(self.__clients), client.UUID))
+
+        del client
     # ***************************************************

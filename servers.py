@@ -3,7 +3,6 @@ from http.server import HTTPServer
 from server import Server
 import threading
 from importlib import reload
-from database.baseUser import DataBaseUser
 
 class Servers():    
     HOST_NAME = 'localhost'

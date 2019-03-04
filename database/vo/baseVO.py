@@ -16,7 +16,7 @@ class BaseVO() :
         result = {}
         
         result['changes'] = {}
-        result['unique'] = self.__getUnique()
+        result['unique'] = self._getUnique()
 
         local = locals()
 
