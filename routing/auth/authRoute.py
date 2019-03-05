@@ -16,10 +16,10 @@ class AuthRoute(Route):
 
         super().__init__(None)
 
-    def do_GET(self, path, params):
+    def request(self, path, params):
         self.__updateLastVisit()
 
-        return super().do_GET(path, params)
+        return super().request(path, params)
 
     def save(self):
         saveData = self.user.getChangeCampression()

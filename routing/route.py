@@ -4,7 +4,7 @@ class Route:
     def __init__(self, user):
         self.__user = user
     
-    def do_GET(self, path, params):
+    def request(self, path, params):
         call = self._routing().get(path)
 
         if call:

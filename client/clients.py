@@ -9,16 +9,16 @@ class Clients:
         self.__cLoginID = None
         self.__cLogOutID = None
 
-    def do_GET(self, path, params):
+    def request(self, path, params):
         client = self.__getClientToParams(params)
-
+        
         if not client and (path == PathConst.LOGIN or PathConst.AUTHORIZATION):
             client = Client()           
-
+            
             self.__listenersClient(client, True)
 
         if client:
-            handler = client.do_GET(path, params)
+            handler = client.request(path, params)
         else:
             handler = BadRequestHandler()
 
@@ -32,7 +32,10 @@ class Clients:
         uuid = None
         
         if 'uuid' in params:
-            uuid = params['uuid'][0]
+            if isinstance(params['uuid'], list):
+                uuid = params['uuid'][0]
+            else:
+                uuid = params['uuid']
 
         if not uuid or not uuid in self.__clients:
             return None

@@ -34,3 +34,13 @@ class UserVO(BaseVO):
         ]
 
         return super()._createResponse(params)
+
+    def applyChanges(self, params):
+        unique = self._getUnique()
+
+        if not params:
+            return
+
+        for key, value in params.items():
+            if not key in unique:
+                setattr(self, key, value)

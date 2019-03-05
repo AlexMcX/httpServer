@@ -36,7 +36,7 @@ class DataBaseSqlite(DataBaseBase):
 
     def change(self, params):
         data = self.__parseToChange(params)
-
+        
         if data:
             try:
                 self.__cur.execute('''UPDATE {} SET {} WHERE {}'''.format(super().currentTable, data[0], data[1]))
@@ -75,13 +75,16 @@ class DataBaseSqlite(DataBaseBase):
             if (result.strip()):
                 result += ' and '
 
-            for attrVattr in attrV:
-                if (not isFirst):
-                    result += " or "
-                result += attr + "='" + attrVattr + "'"
+            if isinstance(attrV, list):
+                for attrVattr in attrV:
+                    if (not isFirst):
+                        result += " or "
+                    result += attr + "='" + attrVattr + "'"
 
-                isFirst = False
-
+                    isFirst = False
+            else:
+               result += attr + "='" + attrV + "'" 
+        
         return result
 
     def __parseToInsert(self, value):
@@ -111,7 +114,7 @@ class DataBaseSqlite(DataBaseBase):
         if 'changes' in value and 'unique' in value:
             setValue = ''            
             for key in value['changes']:
-                setValue += key + '=' + str(value['changes'][key]) + ','
+                setValue += key + '=' + '\'' + str(value['changes'][key]) + '\'' + ','
             
             whereValue = ''
             for key in value['unique']:

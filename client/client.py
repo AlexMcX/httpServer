@@ -21,14 +21,14 @@ class Client:
     def onLogout(self):
         return self.__onLogout
 
-    def do_GET(self, path, params):
+    def request(self, path, params):
         handler = None
 
         if not self.__user and \
         (path == PathConst.LOGIN or path == PathConst.AUTHORIZATION):
             auth = RouteConst.ROUTES.get('auth')()
 
-            handler = auth.do_GET(path, params)
+            handler = auth.request(path, params)
             
             if handler.getStatus() == 200:
                 self.__user = auth.user

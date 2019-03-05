@@ -1,4 +1,5 @@
 import os
+import json
 from urllib.parse import parse_qs, urlparse, parse_qsl
 from http.server import BaseHTTPRequestHandler
 from client.clients import Clients
@@ -24,20 +25,35 @@ class Server(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.end_headers(self)
 
     def do_HEAD(self):
-        return
+        pass
 
-    def do_POST(self):
-        print('Server:do_POST --- ')
+    def do_OPTIONS(self):
+        origin = self.headers.get('origin')
+        
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", origin)
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
 
     def do_GET(self):
         print('Server::do_GET - ', self.path)
 
-        path = urlparse(self.path).path
-        params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
+        if 'Content-Length' in self.headers:
+            content_length = int(self.headers['Content-Length'])
+            params = self.rfile.read(content_length)
+        else:
+            params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
+        
+        if params:
+            self.__request(params)
 
-        self.respond({
-                'handler': Server.__clients.do_GET(path, params)
-            })
+    def do_POST(self):
+        print('Server:do_POST --- ', self.path)
+
+        content_length = int(self.headers['Content-Length'])
+        params = self.rfile.read(content_length)
+        
+        self.__request(params)
 
     def handle_http(self, handler):
         status_code = handler.getStatus()
@@ -57,3 +73,15 @@ class Server(BaseHTTPRequestHandler):
     def respond(self, opts):
         response = self.handle_http(opts['handler'])
         self.wfile.write(response)
+
+    def __request(self, strValue):
+        path = urlparse(self.path).path
+
+        if isinstance(strValue, dict):
+            params = strValue
+        else:
+            params = json.loads(strValue)
+
+        self.respond({
+                'handler': Server.__clients.request(path, params)
+            })

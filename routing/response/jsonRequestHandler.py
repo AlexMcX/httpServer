@@ -11,3 +11,6 @@ class JsonRequestHandler(RequestHandler):
     def getContents(self):
         return json.dumps(super().getContents())
 
+    def setContentsBool(self, value):
+        return super().setContents("{result:" + str(value) + "}")
+
