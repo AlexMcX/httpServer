@@ -7,20 +7,18 @@ def getAllPublicVars(cl):
     return result
             
 # cl - class new instance
-#  readFunc - function read from bd with parameters (fieldName, filterName, filter)
-# [('373b2b48-2adc-11e9-a924-34e12d6aac5b', 't@t', 'p', 1549546091.930708)]
+# dbData - data from dataBase, as object
 def createObjectFromBD(cl, dbData):
-    inst = cl()
-    params = getAllPublicVars(inst)
+    inst = cl()  
     
-    if (len(dbData) != 0):
-        for idx, val in enumerate(params):
-            inst.__dict__[val] = dbData[0][idx]
-        
+    if dbData:
+        for field in dbData:
+            if field in inst.__dict__:
+                inst.__dict__[field] = dbData[field]
+            
         inst.updateChange()
 
-        return inst
-    return None
+    return inst
 
 # registration:  {'email': ['a@t'], 'password': ['p']}
 # '{}','{}','{}','{}'
@@ -57,3 +55,14 @@ def isEqualFields(json, inst):
             return False
         
     return True
+    
+def getCommonFields(json, cl):
+    result = {}
+    inst = cl()
+    params = getAllPublicVars(inst)
+    
+    for val in params:
+        if val in json:
+            result[val] = json[val]
+
+    return result

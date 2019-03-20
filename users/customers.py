@@ -1,7 +1,9 @@
 from const.pathConst import PathConst
-from client.client import Client
+from users.customer import Customer
 from routing.response.badRequestHandler import BadRequestHandler
-class Clients:
+from const.restConst import RestConst
+
+class Customers:
     def __init__(self):
         print(' <<<<<<<<<<<<<<< Create new clients instance >>>>>>>>>>>>>>>>> ')
 
@@ -9,17 +11,29 @@ class Clients:
         self.__cLoginID = None
         self.__cLogOutID = None
 
-    def request(self, path, params):
-        client = self.__getClientToParams(params)
-        
-        if not client and (path == PathConst.LOGIN or PathConst.AUTHORIZATION):
-            client = Client()           
-            
-            self.__listenersClient(client, True)
+    def request(self, path, rest, params):
+        handler = None
 
-        if client:
-            handler = client.request(path, params)
-        else:
+        # if path == PathConst.AUTHORIZATION:
+            # client = self.__getClientToParams(params)
+
+            # if not client:
+                # client = self.__createClient(params)
+
+        customer = self.__getClientToParams(params)
+        
+        if not customer and path == PathConst.AUTHORIZATION:
+            if rest == RestConst.GET:
+                customer = Customer()           
+            
+                self.__listenersClient(customer, True)
+        #     else:
+        #         client = Quest()
+
+        if customer:
+            handler = customer.request(path, rest, params)
+
+        if not handler:
             handler = BadRequestHandler()
 
         return handler
@@ -41,6 +55,14 @@ class Clients:
             return None
 
         return self.__clients[uuid]
+
+    # def __createClient(self, params):
+    #     if 'type' in params:
+    #         if params['type'] == 'guest':
+    #             return Guest()
+
+    #     return None
+        
 
     # ******************** listeners ********************
     def __listenersClient(self, client, access):

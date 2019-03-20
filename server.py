@@ -2,17 +2,18 @@ import os
 import json
 from urllib.parse import parse_qs, urlparse, parse_qsl
 from http.server import BaseHTTPRequestHandler
-from client.clients import Clients
+from users.customers import Customers
 from service.dataBaseService import DataBaseService
+from const.restConst import RestConst
 
 class Server(BaseHTTPRequestHandler):
-    __clients = Clients()
+    __customers = Customers()
 
     @classmethod
     def pre_stop(cls):
         print ('Before calling Server close')
 
-        Server.__clients.save()
+        Server.__customers.save()
 
         DataBaseService.commitAndClose()
 
@@ -44,8 +45,7 @@ class Server(BaseHTTPRequestHandler):
         else:
             params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
         
-        if params:
-            self.__request(params)
+        self.__request(params, RestConst.GET)
 
     def do_POST(self):
         print('Server:do_POST --- ', self.path)
@@ -53,7 +53,7 @@ class Server(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         params = self.rfile.read(content_length)
         
-        self.__request(params)
+        self.__request(params, RestConst.POST)
 
     def handle_http(self, handler):
         status_code = handler.getStatus()
@@ -74,7 +74,7 @@ class Server(BaseHTTPRequestHandler):
         response = self.handle_http(opts['handler'])
         self.wfile.write(response)
 
-    def __request(self, strValue):
+    def __request(self, strValue, rest):
         path = urlparse(self.path).path
 
         if isinstance(strValue, dict):
@@ -83,5 +83,5 @@ class Server(BaseHTTPRequestHandler):
             params = json.loads(strValue)
 
         self.respond({
-                'handler': Server.__clients.request(path, params)
+                'handler': Server.__customers.request(path, rest, params)
             })

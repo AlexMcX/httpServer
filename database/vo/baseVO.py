@@ -1,18 +1,33 @@
+from const.restConst import RestConst 
 class BaseVO() :
+    def __init__(self):
+        self.uuid = None
+
+        self.__chahges = {}
+
+    @property
+    def readBDData(self):
+        return {'uuid':self.uuid}
+
+    # @property
+    # def _GETResponseIDS(self):
+    #     return [ id(self.uuid) ]
+    
+    # @property
+    # def _POSTResponseIDS(self):
+    #     return [ id(self.uuid) ]
+
     # *************** changes data ***************
     def updateChange(self):
         local = locals()
         
         for key in local:
-            if (key == 'self'):
-                if(not self is '__chahges'):
-                    self.__chahges = {}                
-                
+            if (key == 'self'):               
                 for attr, value in local[key].__dict__.items():
                     if attr.find('_BaseVO__'):
                         self.__chahges[attr] = value
         
-    def getChangeCampression(self):
+    def getChangeCompression(self):
         result = {}
         
         result['changes'] = {}
@@ -30,55 +45,58 @@ class BaseVO() :
         return result
     # ********************************************
 
-    # def getResponse(self):
-    #     return self.__createResponse(self.__getResponses())
-        # var = self.__getResponses()
+    def applyChanges(self, params):
+        unique = self._getUnique()
 
-        # if (not var): return None
-            
-        # result = {}
+        if not params:
+            return
 
-        # local = locals()
-        
-        # for k in local:
-        #     if (k == 'self'):                
-        #         for varID in var:
-        #             for attr, value in local[k].__dict__.items():
-        #                 if (varID == id(value)):
-        #                     result[attr] = value
-        #                     continue
+        for key, value in params.items():
+            if not key in unique:
+                setattr(self, key, value)
 
-        #         break
+    def GETResponse(self):
+        return self._createResponse(RestConst.GET)
 
-        # return result
+    # if self is include other response
+    def GETResponseSub(self):
+        return self._createResponse(RestConst.GET,[]) 
     
-    def _createResponse(self, params):
-        if (not params): return None
-            
-        result = {}
+    def POSTResponse(self):
+        return self._createResponse(RestConst.POST)
 
+    # if self is include other response
+    def POSTResponseSub(self):
+        return self._createResponse(RestConst.POST,[])
+
+    def _createResponse(self, rest, noIncludeIDS = None):
+        result = {}        
+
+        if (noIncludeIDS and len(noIncludeIDS) == 0):
+            return result
+
+        # if not includeIDS or (includeIDS and len(includeIDS) > 0):
         local = locals()
-        
-        for k in local:
-            if (k == 'self'):                
-                for varID in params:
-                    for attr, value in local[k].__dict__.items():
-                        if (varID == id(value)):
-                            result[attr] = value
-                            continue
 
+        for localKey in local:
+            if (localKey == 'self'):
+                for attr, value in local[localKey].__dict__.items():                        
+                    if not noIncludeIDS or (noIncludeIDS and not id(attr) in noIncludeIDS):                            
+                        if value and value != self.__chahges:
+                            if isinstance(value, BaseVO):
+                                if rest == RestConst.GET:
+                                    result[attr] = value.GETResponseSub()
+                                else:
+                                    result[attr] = value.POSTResponseSub()
+                            else:
+                                result[attr] = value
+
+            else:
                 break
 
         return result
-
-
-    # def __getResponses(self):
-        # return None
     
-    # return object as example :
-    # {'uuid':483dc9e6-3132-11e9-8d2b-34e12d6aac5c}
-    # to change or save data to database 
     def _getUnique(self):
-        return None
+         return {'uuid':self.uuid}
 
             

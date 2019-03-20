@@ -1,14 +1,26 @@
 from abc import abstractmethod
 
 class Route:
+    __routing = None
+
     def __init__(self, user):
         self.__user = user
-    
-    def request(self, path, params):
-        call = self._routing().get(path)
 
-        if call:
-            return call(params)
+        self.__routing = self._routing()
+
+        self._onInit() 
+    
+    def _onInit(self):
+        pass
+
+    def request(self, path, rest, params):
+        restCalls = self.__routing.get(rest)
+
+        if restCalls:
+            call = restCalls.get(path)
+
+            if call:
+                return call(params)
 
         return None
 

@@ -31,8 +31,10 @@ class DataBaseSqlite(DataBaseBase):
         whereParam = self.__parseToSelect(params)
         
         self.__cur.execute("SELECT * FROM {} WHERE {}".format(super().currentTable, whereParam))
-
-        return self.__cur.fetchall()
+        
+        values = self.__cur.fetchall()
+        
+        return self.__createReadResult(values)
 
     def change(self, params):
         data = self.__parseToChange(params)
@@ -83,7 +85,7 @@ class DataBaseSqlite(DataBaseBase):
 
                     isFirst = False
             else:
-               result += attr + "='" + attrV + "'" 
+                result += attr + "='" + attrV + "'" 
         
         return result
 
@@ -124,5 +126,18 @@ class DataBaseSqlite(DataBaseBase):
             whereValue = whereValue[:len(whereValue) - 1]
 
             return(setValue, whereValue)
+
+        return None
+
+    def __createReadResult(self, values):
+        if (len(values) > 0):
+            result = {}
+            
+            names = list(map(lambda x: x[0], self.__cur.description))
+
+            for idx, name in enumerate(names):
+                result[name] = values[0][idx]
+        
+            return result
 
         return None

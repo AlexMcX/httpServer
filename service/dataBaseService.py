@@ -1,6 +1,7 @@
 class DataBaseService:
     SQLITE3 = 'sqlite3'
-    USER_DATA_BASE = ('db/userBD.db', 'users')
+    CUSTOMER_DATA_BASE = ('db/userBD.db', 'customer')
+    PROFILE_DATA_BASE = ('db/userBD.db', 'profile')
 
     __instance = None
     __type = SQLITE3
@@ -33,14 +34,37 @@ class DataBaseService:
          DataBaseService.__instance = self
 
     @property
-    def users(self):
-        result = self.__getBD(DataBaseService.USER_DATA_BASE)
+    def clients(self):
+        return self.__initBD(DataBaseService.CUSTOMER_DATA_BASE)
+        # result = self.__getBD(DataBaseService.CLIENT_DATA_BASE)
+
+        # if not result:
+        #     result = self.__createBD(DataBaseService.CLIENT_DATA_BASE)
+
+        # result.init(DataBaseService.CLIENT_DATA_BASE[1])
+
+        # return result
+
+    @property
+    def profile(self):
+        return self.__initBD(DataBaseService.PROFILE_DATA_BASE)
+        # result = self.__getBD(DataBaseService.PROFILE_DATA_BASE)
+
+        # if not result:
+        #     result = self.__createBD(DataBaseService.PROFILE_DATA_BASE)
+
+        # result.init(DataBaseService.PROFILE_DATA_BASE[1])
+        
+        # return result
+
+    def __initBD(self, data):
+        result = self.__getBD(data)
 
         if not result:
-            result = self.__createBD(DataBaseService.USER_DATA_BASE)
+            result = self.__createBD(data)
 
-        result.init(DataBaseService.USER_DATA_BASE[1])
-
+        result.init(data[1])
+        
         return result
 
     def __getBD(self, bdType):
