@@ -2,10 +2,10 @@ from abc import abstractmethod
 class DataBaseBase:
     def __init__(self, path):
         self.__table = None
-        self.__connection(path)
+        self._connection(path)
     
     @abstractmethod
-    def __connection(self, path):
+    def _connection(self, path):
         pass
     
     def init(self, table):

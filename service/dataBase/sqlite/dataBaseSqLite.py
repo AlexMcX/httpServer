@@ -5,10 +5,17 @@ class DataBaseSqlite(DataBaseBase):
     def __init__(self, path):
         self.__conn = None
         self.__cur = None
+        self.__columns = None
 
         super().__init__(path)
     
-    def _DataBaseBase__connection(self, path):
+    def init(self, table):
+        super().init(table)
+
+        self.__cur.execute('SELECT * FROM {}'.format(super().currentTable))
+        self.__columns = list(map(lambda x: x[0], self.__cur.description))
+
+    def _connection(self, path):
         self.__conn = sqlite3.connect(path, check_same_thread=False)
 
         self.__cur = self.__conn.cursor()
@@ -28,7 +35,9 @@ class DataBaseSqlite(DataBaseBase):
     # example: SELECT * FROM users WHERE email='user@gmail.com' and password='mypass'
     # whereParam: "email='user@gmail.com' and password='mypass'"
     def read(self, params):
-        whereParam = self.__parseToSelect(params)
+        readParams = self.__createRead(params)
+
+        whereParam = self.__parseToSelect(readParams)
         
         self.__cur.execute("SELECT * FROM {} WHERE {}".format(super().currentTable, whereParam))
         
@@ -38,8 +47,9 @@ class DataBaseSqlite(DataBaseBase):
 
     def change(self, params):
         data = self.__parseToChange(params)
-        
+
         if data:
+            print("    DB SET: to table:", self.currentTable, " params (", data[0], ")")
             try:
                 self.__cur.execute('''UPDATE {} SET {} WHERE {}'''.format(super().currentTable, data[0], data[1]))
 
@@ -53,6 +63,8 @@ class DataBaseSqlite(DataBaseBase):
         if (not self.__conn): return
             
         self.__conn.commit()
+
+        print("    DB commit: table:", self.currentTable)
 
     def close(self):
         if (not self.__conn): return
@@ -114,9 +126,13 @@ class DataBaseSqlite(DataBaseBase):
     
     def __parseToChange(self, value):
         if 'changes' in value and 'unique' in value:
-            setValue = ''            
-            for key in value['changes']:
-                setValue += key + '=' + '\'' + str(value['changes'][key]) + '\'' + ','
+            setValue = ''
+
+            changes = value['changes']
+
+            for key in changes:
+                if key in self.__columns:
+                    setValue += key + '=' + '\'' + str(changes[key]) + '\'' + ','
             
             whereValue = ''
             for key in value['unique']:
@@ -125,18 +141,28 @@ class DataBaseSqlite(DataBaseBase):
             setValue = setValue[:len(setValue) - 1]
             whereValue = whereValue[:len(whereValue) - 1]
 
-            return(setValue, whereValue)
+            if setValue and whereValue:
+                return(setValue, whereValue)
 
+        return None
+
+    def __createRead(self, params):
+        if params:
+            result = {}
+
+            for value in params:
+                if value in self.__columns:
+                    result[value] = params[value]
+
+            return result
         return None
 
     def __createReadResult(self, values):
         if (len(values) > 0):
             result = {}
-            
-            names = list(map(lambda x: x[0], self.__cur.description))
 
-            for idx, name in enumerate(names):
-                result[name] = values[0][idx]
+            for idx, column in enumerate(self.__columns):
+                result[column] = values[0][idx]
         
             return result
 

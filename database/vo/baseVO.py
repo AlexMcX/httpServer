@@ -69,20 +69,19 @@ class BaseVO() :
     def POSTResponseSub(self):
         return self._createResponse(RestConst.POST,[])
 
-    def _createResponse(self, rest, noIncludeIDS = None):
+    def _createResponse(self, rest, noIncludeIDS = None, isNone = False):
         result = {}        
 
         if (noIncludeIDS and len(noIncludeIDS) == 0):
             return result
 
-        # if not includeIDS or (includeIDS and len(includeIDS) > 0):
         local = locals()
 
         for localKey in local:
             if (localKey == 'self'):
-                for attr, value in local[localKey].__dict__.items():                        
-                    if not noIncludeIDS or (noIncludeIDS and not id(attr) in noIncludeIDS):                            
-                        if value and value != self.__chahges:
+                for attr, value in local[localKey].__dict__.items():
+                    if not noIncludeIDS or (noIncludeIDS and not id(value) in noIncludeIDS):                            
+                        if (value or isNone) and value != self.__chahges:
                             if isinstance(value, BaseVO):
                                 if rest == RestConst.GET:
                                     result[attr] = value.GETResponseSub()

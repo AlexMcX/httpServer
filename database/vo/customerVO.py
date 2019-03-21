@@ -8,7 +8,7 @@ class CustomerVO(BaseVO):
         self.lastvisittime = None
 
         # ProfileVO
-        # self.profile = None
+        self.profile = None
 
         super().__init__()
 

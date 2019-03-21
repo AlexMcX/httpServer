@@ -20,9 +20,11 @@ class AuthRoute(Route):
 
     # type is REST type
     def request(self, path, rest, params):
+        response = super().request(path, rest, params)
+
         self.__updateLastVisit()
 
-        return super().request(path, rest, params)
+        return response
 
     def save(self):
         saveData = self.user.getChangeCompression()
@@ -151,9 +153,9 @@ class AuthRoute(Route):
     def __setCurrentUser(self, params):
         if self.user: return
         
-        readParams = getCommonFields(params, CustomerVO)    
+        # readParams = getCommonFields(params, CustomerVO)    
 
-        dbUser = self.__clientBD.read(readParams)
+        dbUser = self.__clientBD.read(params)
         
         self._Route__user = createObjectFromBD(CustomerVO, dbUser)
 

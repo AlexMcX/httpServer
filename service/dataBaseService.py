@@ -20,11 +20,10 @@ class DataBaseService:
     
     @staticmethod
     def commitAndClose():
-        for key, bd in DataBaseService.__bds.items():
-            print(key, bd)
-
-            bd.commit()
-            bd.close()
+        for keyS, bds in DataBaseService.__bds.items():
+            for key, bd in bds.items():
+                bd.commit()
+                bd.close()
 
     def __init__(self):
       """ Virtually private constructor. """
@@ -36,30 +35,14 @@ class DataBaseService:
     @property
     def clients(self):
         return self.__initBD(DataBaseService.CUSTOMER_DATA_BASE)
-        # result = self.__getBD(DataBaseService.CLIENT_DATA_BASE)
-
-        # if not result:
-        #     result = self.__createBD(DataBaseService.CLIENT_DATA_BASE)
-
-        # result.init(DataBaseService.CLIENT_DATA_BASE[1])
-
-        # return result
 
     @property
     def profile(self):
         return self.__initBD(DataBaseService.PROFILE_DATA_BASE)
-        # result = self.__getBD(DataBaseService.PROFILE_DATA_BASE)
-
-        # if not result:
-        #     result = self.__createBD(DataBaseService.PROFILE_DATA_BASE)
-
-        # result.init(DataBaseService.PROFILE_DATA_BASE[1])
-        
-        # return result
 
     def __initBD(self, data):
         result = self.__getBD(data)
-
+        
         if not result:
             result = self.__createBD(data)
 
@@ -69,7 +52,8 @@ class DataBaseService:
 
     def __getBD(self, bdType):
         if bdType[0] in DataBaseService.__bds:
-                return DataBaseService.__bds[bdType[0]]
+            if(bdType[1] in bdType[0]):
+                return DataBaseService.__bds[bdType[0]][bdType[1]]
         return None
 
     def __createBD(self, bdType):
@@ -80,7 +64,10 @@ class DataBaseService:
 
             result = DataBaseSqlite(bdType[0])
 
-            DataBaseService.__bds[bdType[0]] = result
+            if not bdType[0] in DataBaseService.__bds:
+                DataBaseService.__bds[bdType[0]] = {}
+
+            DataBaseService.__bds[bdType[0]][bdType[1]] = result
 
         return result
 

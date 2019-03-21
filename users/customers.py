@@ -14,12 +14,6 @@ class Customers:
     def request(self, path, rest, params):
         handler = None
 
-        # if path == PathConst.AUTHORIZATION:
-            # client = self.__getClientToParams(params)
-
-            # if not client:
-                # client = self.__createClient(params)
-
         customer = self.__getClientToParams(params)
         
         if not customer and path == PathConst.AUTHORIZATION:
@@ -27,8 +21,6 @@ class Customers:
                 customer = Customer()           
             
                 self.__listenersClient(customer, True)
-        #     else:
-        #         client = Quest()
 
         if customer:
             handler = customer.request(path, rest, params)

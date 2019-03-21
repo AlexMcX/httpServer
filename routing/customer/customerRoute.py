@@ -12,17 +12,20 @@ class CustomerRoute(Route):
 
         super().__init__(customer)
 
-    # def _onInit(self):
-    #     if self.user:
-    #         self.__setProfileUser(self.user.readBDData)
+    def _onInit(self):
+        if self.user:
+            self.__setProfileUser(self.user.readBDData)
 
-    def save(self):
-        pass
+    # def save(self):
+    #     saveData = self.user.profile.getChangeCompression()
+
+    #     self.__BD.change(saveData)
 
     def _routing(self):
         return {
                 RestConst.GET: {
-                    PathConst.CUSTOMER     :   self.__customerGET
+                    PathConst.CUSTOMER      :   self.__customerGET,
+                    PathConst.CUSTOMER_FORM :   self.__customerFromGET
                 },
                 RestConst.POST:{
                     PathConst.CUSTOMER     :   self.__customerPOST    
@@ -31,28 +34,29 @@ class CustomerRoute(Route):
 
     def __customerGET(self, params):
         result = JsonRequestHandler()
-        response = self.user.GETResponse()
 
-        response["profile"] = self.__getProfile(params)
-
-        result.setContents(response)
+        result.setContents(self.user.GETResponse())
 
         return result
 
     def __customerPOST(self, params):
-        print("__customerPOST ", params)
+        if not self.user.profile:
+            self.__BD.insert(params)
 
-    def __getProfile(self, params):
-        readParams = getCommonFields(params, ProfileVO)    
-        dbResponce = self.__BD.read(readParams)
-        result = getCommonFields(dbResponce, ProfileVO)
+            self.__setProfileUser(params)
+
+        return None
+
+    def __customerFromGET(self, params):
+        result = JsonRequestHandler()
+        
+        result.setContents(self.user.profile.GETResponseForm())
 
         return result
 
+    def __setProfileUser(self, params):
+        readParams = getCommonFields(params, ProfileVO)    
 
-    # def __setProfileUser(self, params):        
-    #     readParams = getCommonFields(params, ProfileVO)    
-
-    #     dbResponce = self.__BD.read(readParams)
+        dbResponce = self.__BD.read(readParams)
         
-    #     self.user.profile = createObjectFromBD(ProfileVO, dbResponce)
+        self.user.profile = createObjectFromBD(ProfileVO, dbResponce)

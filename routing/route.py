@@ -15,11 +15,11 @@ class Route:
 
     def request(self, path, rest, params):
         restCalls = self.__routing.get(rest)
-
+        
         if restCalls:
             call = restCalls.get(path)
-
-            if call:
+            
+            if call:                
                 return call(params)
 
         return None

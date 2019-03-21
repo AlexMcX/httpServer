@@ -8,17 +8,18 @@ def getAllPublicVars(cl):
             
 # cl - class new instance
 # dbData - data from dataBase, as object
-def createObjectFromBD(cl, dbData):
-    inst = cl()  
-    
+def createObjectFromBD(cl, dbData):   
     if dbData:
+        inst = cl() 
+
         for field in dbData:
             if field in inst.__dict__:
                 inst.__dict__[field] = dbData[field]
             
         inst.updateChange()
 
-    return inst
+        return inst
+    return None
 
 # registration:  {'email': ['a@t'], 'password': ['p']}
 # '{}','{}','{}','{}'
@@ -56,7 +57,7 @@ def isEqualFields(json, inst):
         
     return True
     
-def getCommonFields(json, cl):
+def getCommonFields(json, cl):   
     result = {}
     inst = cl()
     params = getAllPublicVars(inst)
@@ -64,5 +65,7 @@ def getCommonFields(json, cl):
     for val in params:
         if val in json:
             result[val] = json[val]
+
+    inst = None
 
     return result
