@@ -67,7 +67,7 @@ class User:
             route.save()
 
     def dispose(self):
-        pass
+        self.__disposeRoutes()
 
     def __getRequestHandler(self, path, rest, params):
         if self.__routing:
@@ -85,6 +85,11 @@ class User:
         for path, cl in self._routes.items():
             if not isinstance(auth, cl):
                 self.__routing.append(cl(self.__user))
+
+    def __disposeRoutes(self):
+        if self.__routing:
+            for route in self.__routing:
+                route.dispose()
 
     
 

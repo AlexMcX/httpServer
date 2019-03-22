@@ -51,8 +51,6 @@ class DataBaseService:
         
         if not result:
             result = self.__createBD(data)
-
-        # result.init(data[1])
         
         return result
 

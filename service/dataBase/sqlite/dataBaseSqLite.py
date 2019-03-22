@@ -15,9 +15,6 @@ class DataBaseSqlite(DataBaseBase):
         self.__cur.execute('SELECT * FROM {}'.format(super().currentTable))
         self.__columns = list(map(lambda x: x[0], self.__cur.description))
 
-    # def _connection(self, path):
-        # self.__conn = sqlite3.connect(path, timeout = 10, check_same_thread=False)        
-
     def insert(self, params):
         data = self.__parseToInsert(params)
 
@@ -37,11 +34,22 @@ class DataBaseSqlite(DataBaseBase):
 
         whereParam = self.__parseToSelect(readParams)
         
-        self.__cur.execute("SELECT * FROM {} WHERE {}".format(super().currentTable, whereParam))
-        
-        values = self.__cur.fetchall()
-        
-        return self.__createReadResult(values)
+        try:
+            if readParams and whereParam:
+                self.__cur.execute("SELECT * FROM {} WHERE {}".format(super().currentTable, whereParam))
+            
+                values = self.__cur.fetchall()
+            
+                return self.__createReadResult(values)
+        except sqlite3.OperationalError as e:
+            print('          <<<<<<<<<< ERROR !!!!!! DataBaseBase::read !!!!!! >>>>>>>>>>')
+            print('          Error: ', e)
+            print('          Params:', params)
+            print('          ReadParams:', readParams)
+            print('          WhereParam: ', whereParam)
+            print('          Table: ', self.currentTable)
+
+        return None
 
     def change(self, params):
         data = self.__parseToChange(params)
@@ -53,23 +61,12 @@ class DataBaseSqlite(DataBaseBase):
 
                 return True
             except sqlite3.OperationalError as e:
-                print('ERROR !!!!!! DataBaseBase::change - ', e)
+                print('          <<<<<<<<<< ERROR !!!!!! DataBaseBase::change !!!!!! >>>>>>>>>>')
+                print('          Error: ', e)
+                print('          Params:', params)
+                print('          Table: ', self.currentTable)
         
         return False
-
-    # def commit(self):
-    #     if (not self.__conn): return
-            
-    #     self.__conn.commit()
-
-    #     print("    DB commit: table:", self.currentTable)
-
-    # def close(self):
-    #     if (not self.__conn): return
-
-    #     self.__conn.close()
-
-    #     self.__conn = None
 
     # value is unpalsle object
     # value example: {'email': ['user@gmail.com'], 'password': ['mypass']}

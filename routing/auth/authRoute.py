@@ -4,12 +4,12 @@ from abc import abstractmethod
 from utils.objectEx import *
 from database.vo.customerVO import CustomerVO
 from routing.auth.response.loginRequestHandler import LoginRequestHandler
-# from routing.auth.response.registerRequestHandler import RegisterRequestHandler
 from routing.auth.response.logOutRequestHandler import LogOutRequestHandler
 from service.dataBaseService import DataBaseService
 from routing.route import Route
 from const.pathConst import PathConst
 from const.restConst import RestConst
+from const.paramsConst import ParamsConst
 
 class AuthRoute(Route):
     def __init__(self):
@@ -50,12 +50,20 @@ class AuthRoute(Route):
 
     def __authGET(self, params):
         result = LoginRequestHandler()
+        
+        if ParamsConst.AUTHORIZATION in params:
+            params = self.__authorizationCustomer(params[ParamsConst.AUTHORIZATION])
 
-        if not 'uuid' in params:
+            if not params:
+                result.setContentsUserNotExist()
+
+                return result
+    
+        if not ParamsConst.UUID in params:
             params = self.__createClientParams()
 
         self.__setCurrentUser(params)            
- 
+
         # if not validate uuid
         if not self.user:
             params = self.__createClientParams()
@@ -74,9 +82,6 @@ class AuthRoute(Route):
         insert['lastvisittime'] = str(time.time())
 
         self.__clientBD.insert(insert)
-            
-        # if (isInsert):
-        #     self.__clientBD.commit()
 
         return insert
 
@@ -92,73 +97,8 @@ class AuthRoute(Route):
 
         return result
 
-
-
-
-    # def __login(self, params):
-    #     result = LoginRequestHandler()
-
-    #     self.__setCurrentUser(params)
-
-    #     if(not self.user):
-    #         result.setContentsUserNotExist()
-
-    #         return result
-
-    #     result.setContentsSuccess(self.user.getAuthResponse())
-
-    #     return result
-
-    # def __registerGET(self, params):
-    #     result = RegisterRequestHandler()
-
-    #     print("*-*-*-*-*-*-*-*-*-*-*- __registerGET: ", self.user)
-
-    #     return result
-
-    # def __registerPOST(self, params):
-    #     result = RegisterRequestHandler()
-
-    #     result.setContentsUserExist()
-
-    #     if(self.user):
-    #         return result
-        
-    #     # create new user if user not exist in base
-    #     isCreateUser = self.__createUser(params)
-        
-    #     if (isCreateUser):
-    #         self.__setCurrentUser(params)
-
-    #         result.setContentsSuccess(self.user.getAuthResponse())           
-
-    #     return result
-
-    
-
-    # format insert bd - "uuid, email, password, createtime"
-    # def __createUser(self, params):
-    #     if (params):
-    #         insert = params.copy()
-
-    #         insert['icon'] = ''
-    #         insert['uuid'] = str(uuid.uuid1())
-    #         insert['time'] = time.time()
-    #         insert['lastvisittime'] = time.time()
-
-    #         isInsert = self.__userBD.insert(insert)
-            
-    #         if (isInsert) :
-    #             self.__userBD.commit()
-
-    #             return True
-
-    #     return False
-
     def __setCurrentUser(self, params):
-        if self.user: return
-        
-        # readParams = getCommonFields(params, CustomerVO)    
+        if self.user: return 
 
         dbUser = self.__clientBD.read(params)
         
@@ -170,3 +110,15 @@ class AuthRoute(Route):
     def __updateLastVisit(self):
         if self.user:
             self.user.lastvisittime = time.time()
+
+    def __authorizationCustomer(self, authorization):
+        profileBD = DataBaseService.getInstance().profile
+
+        dbUser = profileBD.read(authorization)
+
+        if dbUser and ParamsConst.UUID in dbUser:
+            result = { ParamsConst.UUID:dbUser[ParamsConst.UUID] }
+
+            return result
+
+        return None

@@ -68,28 +68,30 @@ class Customers:
             client.onLogin.remove(self.__cLoginID)
             client.onLogout.remove(self.__cLogOutID)
 
-    def __onLogin(self, client):
-        if client.UUID:
-            self.__clients[client.UUID] = client
+    def __onLogin(self, customer):
+        if customer.UUID:
+            self.__clients[customer.UUID] = customer
 
-            print("    <<< LOGIN USER: total count:{}, user uuid:{} ".format(len(self.__clients), client.UUID))
+            print("    <<< LOGIN USER: total count:{}, user uuid:{} ".format(len(self.__clients), customer.UUID))
         else:
-            self.__listenersClient(client, False)
+            self.__listenersClient(customer, False)
 
-            del client
+            customer.dispose()
+
+            del customer
 
             print("    <<< FAILD LOGIN USER")
 
-    def __onLogout(self, client):
-        if not client:
+    def __onLogout(self, customer):
+        if not customer:
             return
 
-        self.__listenersClient(client, False)
-        self.__clients.pop(client.UUID, None)
+        self.__listenersClient(customer, False)
+        self.__clients.pop(customer.UUID, None)
 
-        client.dispose()       
+        customer.dispose()       
 
-        print("    <<< LOGOUT USER: total count:{}, user uuid:{}".format(len(self.__clients), client.UUID))
+        print("    <<< LOGOUT USER: total count:{}, user uuid:{}".format(len(self.__clients), customer.UUID))
 
-        del client
+        del customer
     # ***************************************************

@@ -1,10 +1,12 @@
 import os
 import json
+import base64
 from urllib.parse import parse_qs, urlparse, parse_qsl
 from http.server import BaseHTTPRequestHandler
 from users.customers import Customers
 from service.dataBaseService import DataBaseService
 from const.restConst import RestConst
+from const.paramsConst import ParamsConst
 
 class Server(BaseHTTPRequestHandler):
     __customers = Customers()
@@ -38,6 +40,7 @@ class Server(BaseHTTPRequestHandler):
 
     def do_GET(self):
         print('Server::do_GET - ', self.path)
+        # print('Server::dd_GET - headres \n', self.headers)
 
         if 'Content-Length' in self.headers:
             content_length = int(self.headers['Content-Length'])
@@ -45,6 +48,8 @@ class Server(BaseHTTPRequestHandler):
         else:
             params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
         
+        self.__parseAuthorization(params)
+
         self.__request(params, RestConst.GET)
 
     def do_POST(self):
@@ -85,3 +90,21 @@ class Server(BaseHTTPRequestHandler):
         self.respond({
                 'handler': Server.__customers.request(path, rest, params)
             })
+
+    def __parseAuthorization(self, params):
+        if not ParamsConst.AUTHORIZATION in self.headers:
+            return
+
+        authorization = self.headers[ParamsConst.AUTHORIZATION]        
+        authmeth, auth = authorization.split(' ')
+
+        params[ParamsConst.AUTHORIZATION] = {}
+
+        if authmeth.lower() == 'basic':
+            auth = base64.b64decode(auth).decode('utf-8')
+            username, password = auth.split(':')
+
+            if '@' in username:
+                params[ParamsConst.AUTHORIZATION][ParamsConst.EMAIL] = username
+            
+            params[ParamsConst.AUTHORIZATION][ParamsConst.PASSWORD] = password

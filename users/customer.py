@@ -4,10 +4,7 @@ from const.routeConst import RouteConst
 # from routing.response.badRequestHandler import BadRequestHandler
 from users.user import User
 
-class Customer(User):
-    def __init__(self):
-        super().__init__()
-    
+class Customer(User):    
     @property
     def _routes(self):
         return RouteConst.USER_ROUTES

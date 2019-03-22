@@ -9,9 +9,14 @@ class Route:
         self.__routing = self._routing()
 
         self._onInit() 
-    
-    def _onInit(self):
-        pass
+
+    def dispose(self):
+        self.save()
+
+        self._onDisposee()
+
+        self.__user = None
+        self.__routing = None        
 
     def request(self, path, rest, params):
         restCalls = self.__routing.get(rest)
@@ -27,6 +32,13 @@ class Route:
     @property
     def user(self):
         return self.__user
+
+    def _onInit(self):
+        pass    
+
+    @abstractmethod
+    def _onDisposee(self):
+        pass
 
     @abstractmethod
     def _routing(self):
