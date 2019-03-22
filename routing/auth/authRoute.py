@@ -73,10 +73,10 @@ class AuthRoute(Route):
         insert['createtime'] = str(time.time())
         insert['lastvisittime'] = str(time.time())
 
-        isInsert = self.__clientBD.insert(insert)
+        self.__clientBD.insert(insert)
             
-        if (isInsert):
-            self.__clientBD.commit()
+        # if (isInsert):
+        #     self.__clientBD.commit()
 
         return insert
 

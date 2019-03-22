@@ -17,9 +17,10 @@ class CustomerRoute(Route):
             self.__setProfileUser(self.user.readBDData)
 
     def save(self):
-        saveData = self.user.profile.getChangeCompression()
+        if self.user.profile:
+            saveData = self.user.profile.getChangeCompression()
 
-        self.__BD.change(saveData)
+            self.__BD.change(saveData)
 
     def _routing(self):
         return {

@@ -5,7 +5,10 @@ class DataBaseService:
 
     __instance = None
     __type = SQLITE3
-    __bds = {}
+    __bds = {}                  # {connection:..., cursors:...}, 
+                                # connection is connection to bd
+                                # cursors is instances of bd classes
+                                # example cursors {tableName:instance}
 
     @staticmethod
     def setTypeBase(typeBD):
@@ -20,10 +23,13 @@ class DataBaseService:
     
     @staticmethod
     def commitAndClose():
-        for keyS, bds in DataBaseService.__bds.items():
-            for key, bd in bds.items():
-                bd.commit()
-                bd.close()
+        for keyS, data in DataBaseService.__bds.items():
+            if "connection" in data:
+                connection = data["connection"]
+
+                if connection:
+                    connection.commit()
+                    connection.close()
 
     def __init__(self):
       """ Virtually private constructor. """
@@ -46,28 +52,41 @@ class DataBaseService:
         if not result:
             result = self.__createBD(data)
 
-        result.init(data[1])
+        # result.init(data[1])
         
         return result
 
     def __getBD(self, bdType):
         if bdType[0] in DataBaseService.__bds:
-            if(bdType[1] in bdType[0]):
-                return DataBaseService.__bds[bdType[0]][bdType[1]]
+            cursors = DataBaseService.__bds[bdType[0]]["cursors"]
+
+            if (bdType[1] in cursors):
+                return cursors[bdType[1]]
         return None
 
     def __createBD(self, bdType):
         result = None
 
-        if (DataBaseService.__type == DataBaseService.SQLITE3):
+        if DataBaseService.__type == DataBaseService.SQLITE3:
+            import sqlite3
             from service.dataBase.sqlite.dataBaseSqLite import DataBaseSqlite
 
-            result = DataBaseSqlite(bdType[0])
+            connection = None            
 
             if not bdType[0] in DataBaseService.__bds:
-                DataBaseService.__bds[bdType[0]] = {}
+                connection = sqlite3.connect(bdType[0], timeout = 10, check_same_thread=False)
 
-            DataBaseService.__bds[bdType[0]][bdType[1]] = result
+                DataBaseService.__bds[bdType[0]] = {
+                    "connection" : connection,
+                    "cursors":{}
+                }
+            else:
+                connection = DataBaseService.__bds[bdType[0]]["connection"]
+
+            result = DataBaseSqlite(connection, bdType[1])
+
+            if not bdType[1] in DataBaseService.__bds[bdType[0]]["cursors"]:
+                DataBaseService.__bds[bdType[0]]["cursors"] = {bdType[1]:result}
 
         return result
 

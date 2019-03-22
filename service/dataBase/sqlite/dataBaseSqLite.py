@@ -2,23 +2,21 @@ import sqlite3
 from service.dataBase.dataBaseBase import DataBaseBase
 
 class DataBaseSqlite(DataBaseBase):
-    def __init__(self, path):
+    def __init__(self, connection, table):
         self.__conn = None
         self.__cur = None
         self.__columns = None
 
-        super().__init__(path)
+        super().__init__(connection, table)
     
-    def init(self, table):
-        super().init(table)
+    def _onInit(self):
+        self.__cur = super().connection.cursor()
 
         self.__cur.execute('SELECT * FROM {}'.format(super().currentTable))
         self.__columns = list(map(lambda x: x[0], self.__cur.description))
 
-    def _connection(self, path):
-        self.__conn = sqlite3.connect(path, timeout = 10, check_same_thread=False)
-
-        self.__cur = self.__conn.cursor()
+    # def _connection(self, path):
+        # self.__conn = sqlite3.connect(path, timeout = 10, check_same_thread=False)        
 
     def insert(self, params):
         data = self.__parseToInsert(params)
@@ -59,19 +57,19 @@ class DataBaseSqlite(DataBaseBase):
         
         return False
 
-    def commit(self):
-        if (not self.__conn): return
+    # def commit(self):
+    #     if (not self.__conn): return
             
-        self.__conn.commit()
+    #     self.__conn.commit()
 
-        print("    DB commit: table:", self.currentTable)
+    #     print("    DB commit: table:", self.currentTable)
 
-    def close(self):
-        if (not self.__conn): return
+    # def close(self):
+    #     if (not self.__conn): return
 
-        self.__conn.close()
+    #     self.__conn.close()
 
-        self.__conn = None
+    #     self.__conn = None
 
     # value is unpalsle object
     # value example: {'email': ['user@gmail.com'], 'password': ['mypass']}

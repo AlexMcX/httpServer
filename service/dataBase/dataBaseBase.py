@@ -1,15 +1,20 @@
 from abc import abstractmethod
 class DataBaseBase:
-    def __init__(self, path):
-        self.__table = None
-        self._connection(path)
+    def __init__(self, connection, table):
+        self.__table = table
+        self.__connection = connection
+        # self._connection(path)
+
+        self._onInit()
+    
+    # @abstractmethod
+    # def _connection(self, path):
+    #     pass
     
     @abstractmethod
-    def _connection(self, path):
+    def _onInit(self):
         pass
-    
-    def init(self, table):
-        self.__table = table
+        # self.__table = table
 
     @abstractmethod
     def insert(self, params):
@@ -23,14 +28,18 @@ class DataBaseBase:
     def change(self, params):
         pass
 
-    @abstractmethod
-    def commit(self):
-        pass
+    # @abstractmethod
+    # def commit(self):
+    #     pass
 
-    @abstractmethod
-    def close(self):
-        pass
+    # @abstractmethod
+    # def close(self):
+    #     pass
 
     @property
     def currentTable(self):
         return self.__table
+
+    @property
+    def connection(self):
+        return self.__connection
