@@ -5,7 +5,7 @@ from const.pathConst import PathConst
 from service.dataBaseService import DataBaseService
 from database.vo.profileVO import ProfileVO
 from routing.response.jsonRequestHandler import JsonRequestHandler
-
+from routing.customer.response.authRequestHandler import AuthRequestHandler
 class CustomerRoute(Route):
     def __init__(self, customer):
         self.__BD = DataBaseService.getInstance().profile
@@ -16,10 +16,10 @@ class CustomerRoute(Route):
         if self.user:
             self.__setProfileUser(self.user.readBDData)
 
-    # def save(self):
-    #     saveData = self.user.profile.getChangeCompression()
+    def save(self):
+        saveData = self.user.profile.getChangeCompression()
 
-    #     self.__BD.change(saveData)
+        self.__BD.change(saveData)
 
     def _routing(self):
         return {
@@ -40,12 +40,18 @@ class CustomerRoute(Route):
         return result
 
     def __customerPOST(self, params):
+        result = AuthRequestHandler()
+
         if not self.user.profile:
             self.__BD.insert(params)
 
             self.__setProfileUser(params)
 
-        return None
+            result.setContentsSuccess()
+        else:
+            result.setContentsUserExist()
+
+        return result
 
     def __customerFromGET(self, params):
         result = JsonRequestHandler()

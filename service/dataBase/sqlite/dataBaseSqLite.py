@@ -16,7 +16,7 @@ class DataBaseSqlite(DataBaseBase):
         self.__columns = list(map(lambda x: x[0], self.__cur.description))
 
     def _connection(self, path):
-        self.__conn = sqlite3.connect(path, check_same_thread=False)
+        self.__conn = sqlite3.connect(path, timeout = 10, check_same_thread=False)
 
         self.__cur = self.__conn.cursor()
 

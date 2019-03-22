@@ -4,7 +4,7 @@ from abc import abstractmethod
 from utils.objectEx import *
 from database.vo.customerVO import CustomerVO
 from routing.auth.response.loginRequestHandler import LoginRequestHandler
-from routing.auth.response.registerRequestHandler import RegisterRequestHandler
+# from routing.auth.response.registerRequestHandler import RegisterRequestHandler
 from routing.auth.response.logOutRequestHandler import LogOutRequestHandler
 from service.dataBaseService import DataBaseService
 from routing.route import Route
@@ -44,7 +44,7 @@ class AuthRoute(Route):
                 },
                 RestConst.POST:{
                     # PathConst.AUTHORIZATION     :   self.__registerPOST,
-                    # PathConst.LOGOUNT           :   self.__logOut       
+                    PathConst.LOGOUNT           :   self.__logOut    
                 }
         }
 
@@ -79,6 +79,21 @@ class AuthRoute(Route):
             self.__clientBD.commit()
 
         return insert
+
+    def __logOut(self, params):
+        result = LogOutRequestHandler()
+
+        if (isEqualFields(params, self.user)):
+            result.setContentsSuccessfully()
+
+            return result
+
+        result.setContentsUserNotExist()
+
+        return result
+
+
+
 
     # def __login(self, params):
     #     result = LoginRequestHandler()
@@ -119,17 +134,7 @@ class AuthRoute(Route):
 
     #     return result
 
-    # def __logOut(self, params):
-    #     result = LogOutRequestHandler()
-
-    #     if (isEqualFields(params, self.user)):
-    #         result.setContentsSuccessfully()
-
-    #         return result
-
-    #     result.setContentsUserNotExist()
-
-    #     return result
+    
 
     # format insert bd - "uuid, email, password, createtime"
     # def __createUser(self, params):
