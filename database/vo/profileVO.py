@@ -6,7 +6,7 @@ class ProfileVO(BaseVO):
         self.password = None
         self.firstName = None
         self.lastName = None
-        self.nickName = None
+        self.userName = None
         self.icon = None
 
         super().__init__()

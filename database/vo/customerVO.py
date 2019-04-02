@@ -6,6 +6,7 @@ class CustomerVO(BaseVO):
     def __init__(self):
         self.createtime = None
         self.lastvisittime = None
+        self.type = None
 
         # ProfileVO
         self.profile = None

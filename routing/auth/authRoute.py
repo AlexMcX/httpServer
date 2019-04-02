@@ -50,7 +50,7 @@ class AuthRoute(Route):
 
     def __authGET(self, params):
         result = LoginRequestHandler()
-        
+
         if ParamsConst.AUTHORIZATION in params:
             params = self.__authorizationCustomer(params[ParamsConst.AUTHORIZATION])
 
@@ -77,9 +77,10 @@ class AuthRoute(Route):
     def __createClientParams(self):
         insert = {}
 
-        insert['uuid'] = str(uuid.uuid1())
+        insert[ParamsConst.UUID] = str(uuid.uuid1())
         insert['createtime'] = str(time.time())
         insert['lastvisittime'] = str(time.time())
+        insert[ParamsConst.TYPE] = ParamsConst.TYPE_GUEST
 
         self.__clientBD.insert(insert)
 

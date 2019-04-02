@@ -1,4 +1,3 @@
-import os
 import json
 import base64
 from urllib.parse import parse_qs, urlparse, parse_qsl
@@ -25,39 +24,46 @@ class Server(BaseHTTPRequestHandler):
 
     def end_headers (self):
         self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
         BaseHTTPRequestHandler.end_headers(self)
 
     def do_HEAD(self):
         pass
 
-    def do_OPTIONS(self):
-        origin = self.headers.get('origin')
+    # def do_OPTIONS(self):
+        # origin = self.headers.get('origin')
         
-        self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", origin)
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        # self.send_response(200)
+        # self.send_header("Access-Control-Allow-Origin", origin)
+        # self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        # self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
 
     def do_GET(self):
-        print('Server::do_GET - ', self.path)
-        # print('Server::dd_GET - headres \n', self.headers)
+        print('Server::do_GET - headers \n', self.headers)
+
 
         if 'Content-Length' in self.headers:
             content_length = int(self.headers['Content-Length'])
+
             params = self.rfile.read(content_length)
         else:
             params = parse_qs(urlparse(self.path).query, keep_blank_values=False)
-        
+
+        print('Server::do_GET - ', self.path, " | ")
+
         self.__parseAuthorization(params)
 
         self.__request(params, RestConst.GET)
 
     def do_POST(self):
-        print('Server:do_POST --- ', self.path)
+        print('Server::do_POST - headers \n', self.headers)
 
         content_length = int(self.headers['Content-Length'])
         params = self.rfile.read(content_length)
-        
+
+        print('Server::do_POST - ', self.path, " | ", params)
+
         self.__request(params, RestConst.POST)
 
     def handle_http(self, handler):

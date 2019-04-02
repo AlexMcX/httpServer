@@ -49,6 +49,8 @@ class CustomerRoute(Route):
             self.__setProfileUser(params)
 
             result.setContentsSuccess()
+
+            self.user.type = "register"
         else:
             result.setContentsUserExist()
 

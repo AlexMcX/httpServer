@@ -2,11 +2,10 @@ import time
 from http.server import HTTPServer
 from server import Server
 import threading
-from importlib import reload
 
 class Servers():    
-    HOST_NAME = 'localhost'
-    PORT_NUMBER = 4201   
+    HOST_NAME = ''
+    PORT_NUMBER = 4201
 
     def __init__(self):
         print('<<<<<<<<<<<<<<< Create new servers instance >>>>>>>>>>>>>>>>>')
